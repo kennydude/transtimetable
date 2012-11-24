@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="64dp"
+        android:src="@drawable/ic_train_icon"
+        android:layout_height="64dp"
+        android:layout_gravity="center_vertical" />
+    
+    <TextView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="London"
+        android:gravity="center_vertical"
+        android:paddingLeft="5dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingTop="4dp"
+        android:minHeight="64dp"
+        android:paddingBottom="4dp"
+        
+        android:id="@+id/title" />
+
+</LinearLayout>

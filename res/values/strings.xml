@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TransTimetable</string>
+    <string name="departures">Departures</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="loading">One Moment Please. Downloading data…</string>
+    <string name="arrives_at">Arrives in {time} ({brick})</string>
+    
+    <string name="empty">Empty</string>
+    
+    <string name="late">LATE</string>
+    <string name="on_time">OK</string>
+    <string name="unknown">\?</string>
+    <string name="canceled">NO</string>
+    <string name="gone">OLD</string>
+    <string name="starts_here">STARTS</string>
+    <string name="refresh">Refresh</string>
+    
+    <string name="favourite">Favourite</string>
+    <string name="favourites">Favourites</string>
+    <string name="nearby">Nearby Stations</string>
+    
+    <string name="last_refreshed">Last Refreshed at {time}</string>
+    
+    <string name="permission">Use Transit Data</string>
+    
+    <string name="permission_desc">Use Transit data provided by plugins installed on the device</string>
+
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="me.kennydude.transtimetable"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="17" />
+    
+    <!-- Will *probably* go in future as data is fetched via "plugins"! -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="me.kennydude.transtimetable.USE_TRANSIT_DATA" />
+    
+    <permission
+        android:name="me.kennydude.transtimetable.USE_TRANSIT_DATA"
+        android:protectionLevel="normal" 
+        android:description="@string/permission_desc"
+        android:label="@string/permission">
+    </permission>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo" >
+        <activity
+            android:name="me.kennydude.transtimetable.ui.StationList"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="me.kennydude.transtimetable.ui.StationView" />
+        
+        <service
+            android:exported="true"
+            android:permission="me.kennydude.transtimetable.USE_TRANSIT_DATA"
+            android:name="me.kennydude.transtimetable.data.NationalRail">
+            
+            <intent-filter>
+                <action android:name="me.kennydude.TRANSIT_INFORMATION" />
+            </intent-filter>
+            
+        </service>
+        
+    </application>
+
+</manifest>
