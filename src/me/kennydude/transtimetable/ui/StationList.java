@@ -12,18 +12,27 @@ import me.kennydude.transtimetable.R;
 import me.kennydude.transtimetable.Station;
 import me.kennydude.transtimetable.ui.TransitActivity.LocateStationHelperCallback;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 /**
@@ -36,6 +45,7 @@ import android.widget.TextView;
 public class StationList extends Activity {
 	public static final int FAVOURITES_ID = 1;
 	public static final int NEARBY_ID = 2;
+	public int hasLocation = 1;
 	StationListAdapter sla;
 	
 	StickyListHeadersListView getListView(){
@@ -52,20 +62,57 @@ public class StationList extends Activity {
 		sla = new StationListAdapter(this);
 		getListView().setAdapter(sla);
 		
-		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		setupStationListView(getListView(), sla, this);
+	}
+	
+	public static void setupStationListView(ListView p, final BaseStationListAdapter sla, final Activity me){
+		p.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
 					long arg3) {
 				StationListItem sli = sla.items.get(pos);
 				
-				Intent i = new Intent(StationList.this, StationView.class);
+				Intent i = new Intent(me, StationView.class);
 				i.putExtra("pname", sli.pname);
 				i.putExtra("class", sli.cls);
 				i.putExtra("station", sli.id);
-				startActivity(i);
+				me.startActivity(i);
 			}
 		});
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu u){
+		new MenuInflater(this).inflate(R.menu.activity_stationlist, u);
+		
+		if(hasLocation == 2){
+			u.findItem(R.id.relocate).setIcon(R.drawable.ic_action_location_on);
+		} else if(hasLocation == 1){
+			ProgressBar pv = new ProgressBar(this, null,
+					android.R.attr.progressBarStyleSmall);
+			u.findItem(R.id.relocate).setEnabled(false).setActionView(pv);
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item){
+		switch(item.getItemId()){
+		case R.id.search:
+			onSearchRequested();
+			break;
+		case R.id.relocate:
+			hasLocation = 1;
+			invalidateOptionsMenu();
+			
+			LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+			lm.removeUpdates(mLocationListener);
+			requestLocationUpdates();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	LocationListener mLocationListener = new LocationListener(){
@@ -77,25 +124,21 @@ public class StationList extends Activity {
 
 				@Override
 				public void run() {
+					runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							hasLocation = 1;
+							invalidateOptionsMenu();
+						}
+					});
 					TransitActivity.locateStationHelper(StationList.this, new LocateStationHelperCallback<StationListItem>(){
 
 						@Override
 						public List<StationListItem> getStations(TransServiceBinder tsb, ComponentName cn) {
-							System.out.println(cn.toShortString());
 							List<Station> items = tsb.getStationsNearby( whereAmI.getLatitude(), whereAmI.getLongitude() );
 							if(items == null) return null;
-							
-							ArrayList<StationListItem> r = new ArrayList<StationListItem>();
-							for(Station item : items){
-								StationListItem sli = new StationListItem();
-								sli.headerId = NEARBY_ID;
-								sli.id = item.id;
-								sli.station = item;
-								sli.pname = cn.getPackageName();
-								sli.cls = cn.getClassName();
-								r.add(sli);
-							}
-							return r;
+							return stationsToLI(items, cn, NEARBY_ID);
 						}
 
 						@Override
@@ -105,6 +148,9 @@ public class StationList extends Activity {
 
 								@Override
 								public void run() {
+									hasLocation = 2;
+									invalidateOptionsMenu();
+									
 									sla.removeAllUnderHeader( NEARBY_ID );
 									sla.items.addAll(sla.items.size(), results);
 									sla.notifyDataSetChanged();
@@ -121,7 +167,19 @@ public class StationList extends Activity {
 
 		@Override public void onProviderDisabled(String arg0) {}
 		@Override public void onProviderEnabled(String arg0) {}
-		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+		@Override public void onStatusChanged(String arg0, int status, Bundle arg2) {
+			if(status != LocationProvider.AVAILABLE){
+				runOnUiThread(new Runnable(){
+
+					@Override
+					public void run() {
+						hasLocation = 0;
+						invalidateOptionsMenu();
+					}
+					
+				});
+			}
+		}
 		
 	};
 	
@@ -131,11 +189,15 @@ public class StationList extends Activity {
 		lm.removeUpdates(mLocationListener);
 	}
 	
+	void requestLocationUpdates(){
+		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		lm.requestLocationUpdates( 1000 * 60 * 10, 10, new Criteria(), mLocationListener, null );
+	}
+	
 	public void onResume(){
 		super.onResume();
 		
-		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates( 1000 * 60 * 10, 10, new Criteria(), mLocationListener, null );
+		requestLocationUpdates();
 		
 		// Get Favourites
 		sla.removeAllUnderHeader(FAVOURITES_ID);
@@ -158,7 +220,7 @@ public class StationList extends Activity {
 		sla.notifyDataSetInvalidated();
 	}
 	
-	public class StationListItem {
+	public static class StationListItem {
 		public Station station;
 		
 		public String id;
@@ -168,12 +230,24 @@ public class StationList extends Activity {
 		public int headerId;
 	}
 	
-	public class StationListAdapter extends StickyListHeadersBaseAdapter {
-		public List<StationListItem> items;
+	public static List<StationListItem> stationsToLI(List<Station> items, ComponentName cn, int hI){
+		ArrayList<StationListItem> r = new ArrayList<StationListItem>();
+		for(Station item : items){
+			StationListItem sli = new StationListItem();
+			sli.headerId = hI;
+			sli.id = item.id;
+			sli.station = item;
+			sli.pname = cn.getPackageName();
+			sli.cls = cn.getClassName();
+			r.add(sli);
+		}
+		return r;
+	}
+	
+	public class StationListAdapter extends BaseStationListAdapter {
 
 		public StationListAdapter(Context context) {
 			super(context);
-			items = new ArrayList<StationListItem>();
 		}
 		
 		public void removeAllUnderHeader(int id){
@@ -185,57 +259,13 @@ public class StationList extends Activity {
 		}
 
 		@Override
-		public View getHeaderView(int position, View convertView) {
-			if(convertView == null){
-				convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_station_header, null);
-			}
-			
-			position = items.get(position).headerId;
-			
-			TextView tv = (TextView) convertView;
+		public String getHeaderTitle(int position) {
 			if(position == FAVOURITES_ID){
-				tv.setText(R.string.favourites);
+				return getString(R.string.favourites);
 			} else if(position == NEARBY_ID){
-				tv.setText(R.string.nearby);
+				return getString(R.string.nearby);
 			}
-			
-			return convertView;
-		}
-
-		@Override
-		public long getHeaderId(int position) {
-			return items.get(position).headerId;
-		}
-
-		@Override
-		public int getCount() {
-			return items.size();
-		}
-
-		@Override
-		public Object getItem(int arg0) {
-			return items.get(arg0);
-		}
-
-		@Override
-		public long getItemId(int arg0) {
-			return arg0;
-		}
-
-		@Override
-		protected View getView(int position, View convertView) {
-			if(convertView == null){
-				convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_station, null);
-			}
-			
-			StationListItem sli = items.get(position);
-			
-			if(sli.station != null){
-				((TextView)convertView.findViewById(R.id.title)).setText(sli.station.name);
-				((ImageView)convertView.findViewById(R.id.icon)).setImageResource( DrawableLookup.getTransitDrawable( sli.station.type ) );
-			}
-			
-			return convertView;
+			return "";
 		}
 		
 	}

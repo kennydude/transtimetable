@@ -22,6 +22,7 @@ public abstract class TransService extends Service {
 	public abstract Station getStation(String stationID);
 	
 	public abstract List<Station> getNearbyStations(double lat, double lon);
+	public abstract List<Station> getMatchingStations(String key);
 	
 	@Override
 	public IBinder onBind(Intent i){
@@ -37,7 +38,7 @@ public abstract class TransService extends Service {
 		
 		@Override
 		public String getMatchingStations(String query) throws RemoteException {
-			return null;
+			return serializeStationList(TransService.this.getMatchingStations(query));
 		}
 		
 		private String serializeTransitList(List<TransitItem> in){

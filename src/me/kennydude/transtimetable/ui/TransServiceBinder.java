@@ -26,6 +26,24 @@ public class TransServiceBinder {
 		}
 	}
 	
+	public List<Station> searchStations(String key){
+		try{
+			List<Station> r = new ArrayList<Station>();
+			
+			JSONArray ja = new JSONArray( backend.getMatchingStations(key) );
+			
+			for(int i = 0; i < ja.length(); i ++){
+				Station it = Station.fromJSONObject( ja.getJSONObject(i) );
+				r.add(it);
+			}
+			return r;
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public List<Station> getStationsNearby(double lat, double lon){
 		try{
 			List<Station> r = new ArrayList<Station>();

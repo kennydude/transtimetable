@@ -7,6 +7,8 @@
     <string name="loading">One Moment Please. Downloading data…</string>
     <string name="arrives_at">Arrives in {time} ({brick})</string>
     
+    <string name="relocate_me">Relocate Me</string>
+    
     <string name="empty">Empty</string>
     
     <string name="late">LATE</string>
@@ -26,5 +28,9 @@
     <string name="permission">Use Transit Data</string>
     
     <string name="permission_desc">Use Transit data provided by plugins installed on the device</string>
+    
+    <string name="search">Search</string>
+    
+    <string name="search_stations">Search for stations by name</string>
 
 </resources>

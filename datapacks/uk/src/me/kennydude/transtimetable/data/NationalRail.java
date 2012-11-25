@@ -204,14 +204,33 @@ public class NationalRail extends TransService {
 		try{
 			List<Station> r = new ArrayList<Station>();
 			String sql = "SELECT * FROM stations ORDER BY " + Utils.getOrderBySQL(lat, lon) + " LIMIT 0, 10";
-			System.out.println(sql);
 			Cursor t = stations.rawQuery(sql, new String[]{});
-			//t.moveToFirst();
 			
 			while(t.moveToNext() == true){
 				r.add(fromCursor(t));
 			}
-			System.out.println(r.size());
+			
+			stations.close();
+			
+			return r;
+		} catch(Exception e){ e.printStackTrace(); } 
+		return null;
+	}
+
+	@Override
+	public List<Station> getMatchingStations(String key) {
+		ensureStationsLoaded();
+		try{
+			List<Station> r = new ArrayList<Station>();
+			String sql = "SELECT * FROM `stations` WHERE name LIKE '%"+key+"%' OR code LIKE '%"+key+"%' LIMIT 0, 10";
+			Cursor t = stations.rawQuery(sql, new String[]{});
+			
+			while(t.moveToNext() == true){
+				r.add(fromCursor(t));
+			}
+			
+			stations.close();
+			
 			return r;
 		} catch(Exception e){ e.printStackTrace(); } 
 		return null;

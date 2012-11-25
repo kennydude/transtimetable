@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:showAsAction="always"
+        android:id="@+id/relocate"
+        android:title="@string/relocate_me"
+        android:icon="@drawable/ic_action_location_off" />
+    
+    <item
+        android:id="@+id/search"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_action_search"
+        android:title="@string/search" />
+    
+</menu>
