@@ -37,4 +37,16 @@
     <string name="install">Install</string>
     <string name="pack_description">TransTimetable needs plugins to work so you are getting the data that is relevant to you!</string>
     
+    <string name="arrives_at_late">Arrives {time} ({brick}, but was meant to arrive at {meant})</string>
+    <string name="about">About</string>
+    
+    <string name="travel_update">Travel Update</string>
+    <string name="ok">OK</string>
+    <string name="stop">STOP</string>
+    <string name="platform">PLATFORM</string>
+
+    <string name="from_to">From {from} to {to}</string>
+
+    <string name="share_app">Share Me!</string>
+    
 </resources>
