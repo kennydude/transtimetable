@@ -24,6 +24,12 @@
                  android:showAsAction="withText"
                  android:title="@string/data_packs">
              </item>
+             
+             <item
+                 android:showAsAction="withText"
+                 android:title="@string/about"
+                 android:id="@+id/about">
+             </item>
             
         </menu>
     </item>

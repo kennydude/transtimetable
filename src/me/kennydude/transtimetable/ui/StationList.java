@@ -110,6 +110,10 @@ public class StationList extends Activity {
 	@Override
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
+		case R.id.about:
+			Intent ai = new Intent(this, AboutView.class);
+			startActivity(ai);
+			break;
 		case R.id.packs:
 			Intent i = new Intent(this, PackList.class);
 			startActivity(i);
