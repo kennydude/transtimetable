@@ -72,6 +72,10 @@ public abstract class TransitActivity extends Activity {
 		};
 		
 		at = 0;
+		if(ril.size() == 0){
+			cback.fLocation(results);
+			return;
+		}
 		intent.setClassName(ril.get(at).serviceInfo.packageName, ril.get(at).serviceInfo.name);
 		a.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}

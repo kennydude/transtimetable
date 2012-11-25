@@ -32,5 +32,9 @@
     <string name="search">Search</string>
     
     <string name="search_stations">Search for stations by name</string>
+    
+    <string name="data_packs">Get Data Packs</string>
+    <string name="install">Install</string>
+    <string name="pack_description">TransTimetable needs plugins to work so you are getting the data that is relevant to you!</string>
 
 </resources>

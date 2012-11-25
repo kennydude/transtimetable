@@ -10,12 +10,14 @@ import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
 import me.kennydude.transtimetable.R;
 import me.kennydude.transtimetable.Station;
+import me.kennydude.transtimetable.Utils;
 import me.kennydude.transtimetable.ui.TransitActivity.LocateStationHelperCallback;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -62,6 +64,14 @@ public class StationList extends Activity {
 		sla = new StationListAdapter(this);
 		getListView().setAdapter(sla);
 		
+		PackageManager pm = getPackageManager();
+		Intent intent = new Intent(Utils.TRANSIT_SERVICE_ACTION);
+		if(pm.queryIntentServices(intent, 0).size() == 0){
+			Intent i = new Intent(this, PackList.class);
+			startActivity(i);
+			finish();
+		}
+		
 		setupStationListView(getListView(), sla, this);
 	}
 	
@@ -100,6 +110,10 @@ public class StationList extends Activity {
 	@Override
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
+		case R.id.packs:
+			Intent i = new Intent(this, PackList.class);
+			startActivity(i);
+			break;
 		case R.id.search:
 			onSearchRequested();
 			break;
