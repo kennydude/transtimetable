@@ -26,6 +26,24 @@ public class TransServiceBinder {
 		}
 	}
 	
+	public String getStatusUpdate(String id){
+		try{
+			return backend.getTravelUpdates(id);
+		} catch(Exception e){
+			e.printStackTrace();
+			return "";
+		}
+	}
+	
+	public TransitItem getTransitItem(String id){
+		try{
+			return TransitItem.fromJSONObject( new JSONObject( backend.getTransitItemDetails(id) ) );
+		} catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public List<Station> searchStations(String key){
 		try{
 			List<Station> r = new ArrayList<Station>();

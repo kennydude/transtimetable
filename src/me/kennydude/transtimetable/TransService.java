@@ -24,6 +24,9 @@ public abstract class TransService extends Service {
 	public abstract List<Station> getNearbyStations(double lat, double lon);
 	public abstract List<Station> getMatchingStations(String key);
 	
+	public abstract TransitItem getTransitDetails(String id);
+	public abstract String getTravelUpdateForStation(String id);
+	
 	@Override
 	public IBinder onBind(Intent i){
 		return t;
@@ -73,8 +76,12 @@ public abstract class TransService extends Service {
 	
 		@Override
 		public String getTransitItemDetails(String id) throws RemoteException {
-			// TODO Auto-generated method stub
-			return null;
+			return TransService.this.getTransitDetails(id).toJSONObject().toString();
+		}
+
+		@Override
+		public String getTravelUpdates(String id) throws RemoteException {
+			return TransService.this.getTravelUpdateForStation(id);
 		}
 	}
 

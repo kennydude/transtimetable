@@ -3,6 +3,8 @@ package me.kennydude.transtimetable;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.content.Context;
+
 public class Utils {
 	public static final String TRANSIT_SERVICE_ACTION = "me.kennydude.TRANSIT_INFORMATION";
 	
@@ -10,6 +12,11 @@ public class Utils {
 		// Thanks http://stackoverflow.com/a/7472230/230419
 		double fudge = Math.pow( lat, 2 );
 		return "(( "+ lat+ " - lat) * ("+lat+" - lat) + ("+lon+" - lon) * ("+lon+" - lon) * "+fudge+")";
+	}
+	
+	public static int convertDpToPx(Context mContext, float dp) {
+		final float scale = mContext.getResources().getDisplayMetrics().density;
+		return (int) (dp * scale + 0.5f);
 	}
 	
 	static String dp(int in){
@@ -28,21 +35,36 @@ public class Utils {
 		return friendlyTimeShort(when.getTime());
 	}
 	
+	public static String friendlyTimeShort(Calendar when, Calendar now){
+		return friendlyTimeShort(when.getTime(), now.getTime());
+	}
+	
+	public static String friendlyTimeShort(Date when){
+		return friendlyTimeShort(when, new Date());
+	}
+	
 	// Time until when
-	public static String friendlyTimeShort(Date when) {
-		Date now = new Date();
+	public static String friendlyTimeShort(Date when, Date now) {
 		long diff =  when.getTime() - now.getTime();
+		
+		String prefix = "in ", suffix = "";
+		if(diff < 0){
+			diff = diff - diff - diff;
+			prefix = "";
+			suffix = " ago";
+		}
+		
 		if (diff <= 60000) {
 			long seconds = (diff / 6000);
-			return Long.toString(seconds) + "s";
+			return prefix + Long.toString(seconds) + "s" + suffix;
 		} else if (diff <= 3600000) {
-			return Long.toString(diff / 60000) + "m";
+			return prefix + Long.toString(diff / 60000) + "m" + suffix;
 		} else if (diff <= 86400000) {
-			return Long.toString(diff / 3600000) + "h";
+			return prefix + Long.toString(diff / 3600000) + "h" + suffix;
 		} else if (diff <= 604800000) {
-			return Long.toString(diff / 86400000) + "d";
+			return prefix + Long.toString(diff / 86400000) + "d" + suffix;
 		} else
-			return Long.toString(diff / 604800000) + "w";
+			return prefix + Long.toString(diff / 604800000) + "w" + suffix;
 	}
 
 	public static String saveCalendar(Calendar when) {

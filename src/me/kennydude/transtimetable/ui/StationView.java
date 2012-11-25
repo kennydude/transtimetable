@@ -10,7 +10,9 @@ import me.kennydude.transtimetable.R;
 import me.kennydude.transtimetable.Station;
 import me.kennydude.transtimetable.TransitItem;
 import me.kennydude.transtimetable.Utils;
+import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -19,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -64,6 +67,25 @@ public class StationView extends TransitActivity {
 		doButton(R.id.depart, 0);
 		doButton(R.id.arrive, 1);
 		
+		findViewById(R.id.travel_update).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder ab = new AlertDialog.Builder(StationView.this);
+				ab.setTitle(R.string.travel_update);
+				ab.setMessage( ((TextView)v).getText());
+				ab.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dlg, int arg1) {
+						dlg.dismiss();
+					}
+				});
+				
+				ab.show();
+			}
+		});
+		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		pages = new SimpleFragmentPagerAdapter(this);
@@ -74,6 +96,7 @@ public class StationView extends TransitActivity {
 			public void onPageSelected(int position) {
 				updateButtonStates(position);
 				getCurrentItem().onDisplay();
+				invalidateOptionsMenu();
 			}
 			
 			@Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
@@ -109,6 +132,24 @@ public class StationView extends TransitActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	public void showTravelUpdates(final String updates){
+		runOnUiThread(new Runnable(){
+
+			@Override
+			public void run() {
+				if(updates.isEmpty()){
+					findViewById(R.id.travel_update).setVisibility(View.GONE);
+				} else{
+					TextView tv = (TextView) findViewById(R.id.travel_update);
+					tv.setText(updates);
+					tv.setVisibility(View.VISIBLE);
+					tv.setSelected(true);
+				}
+			}
+			
+		});
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu u){
 		new MenuInflater(this).inflate(R.menu.activity_stationview, u);
@@ -141,6 +182,10 @@ public class StationView extends TransitActivity {
 			public void run() {
 				thisStation = getTransService().getStationDetails(stationId);
 				CacheManager.saveCache(StationView.this, "station-" + stationId, thisStation.toJSONObject().toString());
+				
+				String travel = CacheManager.getCacheItem(StationView.this, stationId + "-station-tu");
+				if(travel != null)
+					showTravelUpdates(travel);
 				
 				runOnUiThread(new Runnable(){
 
@@ -192,6 +237,24 @@ public class StationView extends TransitActivity {
 			lastRefreshed.setGravity( Gravity.CENTER );
 			getListView().addHeaderView(lastRefreshed);
 			
+			getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> view, View arg1,
+						int pos, long arg3) {
+					if(pos == 0) return; // header
+					TransitItem ti = (TransitItem) view.getItemAtPosition(pos);
+					
+					Intent i = new Intent(getActivity(), TransitItemView.class);
+					i.putExtra("id", ti.id);
+					i.putExtra("transit", ti.toJSONObject().toString());
+					i.putExtra("pname", getActivity().getIntent().getStringExtra("pname"));
+					i.putExtra("class", getActivity().getIntent().getStringExtra("class"));
+					
+					startActivity(i);
+				}
+			});
+			
 			setEmptyText(getString(R.string.empty));
 			tia = new TransitItemAdapter(getActivity(), 0);
 			setListAdapter(tia);
@@ -227,6 +290,8 @@ public class StationView extends TransitActivity {
 								for(int i = 0; i < ja.length(); i ++){
 									items.add( TransitItem.fromJSONObject(ja.getJSONObject(i)) );
 								}
+								
+								
 								getActivity().runOnUiThread(new Runnable(){
 
 									@Override
@@ -254,30 +319,50 @@ public class StationView extends TransitActivity {
 
 				@Override
 				public void run() {
-					final List<TransitItem> items = getItems();
-					
-					// Save Cache
-					JSONArray ja = new JSONArray();
-					for(TransitItem ti : items){
-						ja.put(ti.toJSONObject());
-					}
-					CacheManager.saveCache( getActivity(), getCacheKey(), ja.toString() );
-					
-					getActivity().runOnUiThread(new Runnable(){
-
-						@Override
-						public void run() {
-							tia.clear();
-							if(items != null){
-								tia.addAll(items);
-							}
-							setLastRefreshed( Calendar.getInstance() );
-							setRefreshing(false);
-							setListShown(true);
-							tia.notifyDataSetInvalidated();
+					try{
+						final List<TransitItem> items = getItems();
+						
+						if(items == null){
+							getActivity().runOnUiThread(new Runnable(){
+	
+								@Override
+								public void run() {
+									setRefreshing(false);
+								}
+							});
+							return;
 						}
 						
-					});
+						// Save Cache
+						JSONArray ja = new JSONArray();
+						for(TransitItem ti : items){
+							ja.put(ti.toJSONObject());
+						}
+						CacheManager.saveCache( getActivity(), getCacheKey(), ja.toString() );
+						
+						String travel = getTransService().getStatusUpdate(getThisStation().id);
+						((StationView)getActivity()).showTravelUpdates( travel );
+						CacheManager.saveCache(getActivity(), getThisStation().id + "-station-tu", travel);
+						
+						getActivity().runOnUiThread(new Runnable(){
+	
+							@Override
+							public void run() {
+								tia.clear();
+								if(items != null){
+									tia.addAll(items);
+								}
+								setLastRefreshed( Calendar.getInstance() );
+								setRefreshing(false);
+								setListShown(true);
+								tia.notifyDataSetInvalidated();
+							}
+							
+						});
+						
+					} catch(Exception e){
+						e.printStackTrace();
+					}
 				}
 				
 			}).start();

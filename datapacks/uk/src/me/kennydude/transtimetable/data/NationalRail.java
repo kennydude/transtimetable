@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +36,7 @@ import me.kennydude.transtimetable.TransitItem.TransitType;
  */
 public class NationalRail extends TransService {
 	public static final String USER_AGENT = "Mozilla/5.0 (Linux; U; Android 3.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13";
+	HashMap<String, String> travelUpdates = new HashMap<String, String>();
 	
 	class NREDBHelper extends SQLiteOpenHelper{
 		public static final int DATABASE_VERSION = 1;
@@ -114,6 +116,14 @@ public class NationalRail extends TransService {
 		
 		ArrayList<TransitItem> r = new ArrayList<TransitItem>();
 		
+		// Get travel updates for static linking
+		Elements alerts = dom.select("tr.alert");
+		String information = "";
+		for(Element alert : alerts){
+			information += alert.text() + ". ";
+		}
+		travelUpdates.put(stationID, information);
+		
 		// Go to h2s which are the TransitTypes
 		Elements hl = dom.select("h2.hList");
 		for( Element heading : hl ){
@@ -146,32 +156,7 @@ public class NationalRail extends TransService {
 					ti.from = stationID;
 					ti.to = item.select(".station").text();
 					
-					TransitItem.Stop thisStop = new TransitItem.Stop();
-					
-					String[] time = item.select(".time").get(0).ownText().split(":");
-					Calendar when = Calendar.getInstance();
-					when.setTime(new Date());
-					when.set(Calendar.HOUR_OF_DAY, Integer.parseInt( time[0] ) );
-					when.set(Calendar.MINUTE, Integer.parseInt( time[1] ) );
-					thisStop.when = when;
-					
-					String status = item.select(".time small").text().toLowerCase(Locale.UK);
-					if(status.equals("on time")){
-						thisStop.status = TransitItem.Stop.Status.ON_TIME;
-					} else if(status.equals("starts here")){
-						thisStop.status = TransitItem.Stop.Status.STARTS_HERE;
-					} else if(status.contains(":")){
-						// Late
-						thisStop.status = TransitItem.Stop.Status.LATE;
-					} else if(status.contains("cancelled")){
-						thisStop.status = TransitItem.Stop.Status.CANCELED;
-					}
-					
-					if( item.select(".platform").size() > 0 ){
-						thisStop.where = item.select(".platform").get(0).ownText();
-					}
-					
-					ti.stops.add(thisStop);
+					ti.stops.add( scrapStop(item) );
 					ti.preferedStop = 0;
 					
 					r.add(ti);
@@ -180,6 +165,42 @@ public class NationalRail extends TransService {
 		}
 		
 		return r;
+	}
+	
+	TransitItem.Stop scrapStop(Element item){
+		TransitItem.Stop thisStop = new TransitItem.Stop();
+		
+		String[] time = item.select(".time").get(0).ownText().split(":");
+		Calendar when = Calendar.getInstance();
+		when.setTime(new Date());
+		when.set(Calendar.HOUR_OF_DAY, Integer.parseInt( time[0] ) );
+		when.set(Calendar.MINUTE, Integer.parseInt( time[1] ) );
+		thisStop.when = when;
+		
+		String status = item.select(".time small").text().toLowerCase(Locale.UK);
+		if(status.equals("on time")){
+			thisStop.status = TransitItem.Stop.Status.ON_TIME;
+		} else if(status.equals("starts here")){
+			thisStop.status = TransitItem.Stop.Status.STARTS_HERE;
+		} else if(status.contains(":")){
+			// Late
+			time = status.split(":");
+			
+			when = Calendar.getInstance();
+			when.setTime(new Date());
+			when.set(Calendar.HOUR_OF_DAY, Integer.parseInt( time[0] ) );
+			when.set(Calendar.MINUTE, Integer.parseInt( time[1] ) );
+			thisStop.delayedUntil = when;
+			thisStop.status = TransitItem.Stop.Status.LATE;
+		} else if(status.contains("cancelled")){
+			thisStop.status = TransitItem.Stop.Status.CANCELED;
+		}
+		
+		if( item.select(".platform").size() > 0 ){
+			thisStop.platform = item.select(".platform").get(0).ownText();
+			thisStop.whereType = TransitItem.Stop.WhereType.PLATFORM;
+		}
+		return thisStop;
 	}
 
 	@Override
@@ -234,6 +255,38 @@ public class NationalRail extends TransService {
 			return r;
 		} catch(Exception e){ e.printStackTrace(); } 
 		return null;
+	}
+
+	@Override
+	public TransitItem getTransitDetails(String url) {
+		Document dom = getDOM("http://m.nationalrail.co.uk" + url);
+		if(dom == null) return null;
+		
+		TransitItem r = new TransitItem();
+		
+		Elements dTable = dom.select("table.jDest tr");
+		r.from = dTable.get(0).getElementsByTag("td").get(1).text();
+		r.to =  dTable.get(1).getElementsByTag("td").get(1).ownText();
+		
+		Elements stops = dom.select(".aList li");
+		for(Element stop : stops){
+			TransitItem.Stop s = scrapStop(stop);
+			if(stop.select(".last_reported").size() > 0){
+				s.here = true;
+			}
+			s.where = stop.select(".station").text();
+			
+			r.stops.add(s);
+		}
+		
+		return r;
+	}
+	
+	@Override
+	public String getTravelUpdateForStation(String id){
+		if(travelUpdates.containsKey(id))
+			return travelUpdates.get(id);
+		return "";
 	}
 
 }

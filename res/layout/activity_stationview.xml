@@ -3,6 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+   	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:visibility="gone"
+        android:ellipsize="marquee"
+        android:scrollHorizontally="true"
+        android:padding="9dp"
+        android:background="@android:color/holo_red_dark"
+        android:textColor="#FFF"
+        android:text="Travel Updates For example if a car explodes in the middle of the place etc"
+        android:id="@+id/travel_update" />
 
     <LinearLayout
         android:layout_height="wrap_content"

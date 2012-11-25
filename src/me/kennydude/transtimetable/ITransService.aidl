@@ -16,4 +16,5 @@ interface ITransService{
 	String getTransitItemDetails( String id );
 	
 	String getStationDetails( String id );
+	String getTravelUpdates( String id );
 }

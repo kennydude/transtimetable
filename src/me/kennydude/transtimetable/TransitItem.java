@@ -44,10 +44,18 @@ public class TransitItem {
 			LATE, ON_TIME, CANCELED, PAST, UNKNOWN, STARTS_HERE
 		}
 		
+		public static enum WhereType{
+			PLATFORM, STOP, UNKNOWN
+		}
+		
+		public WhereType whereType = WhereType.UNKNOWN;
 		public String where = "";
 		public String platform = "";
 		public Calendar when = null;
 		public Status status = Status.UNKNOWN;
+		public Calendar delayedUntil = null;
+		
+		public boolean here = false;
 		
 		public JSONObject toJSONObject(){
 			try{
@@ -56,6 +64,12 @@ public class TransitItem {
 				jo.put("platform", platform);
 				jo.put("when", Utils.saveCalendar(when));
 				jo.put("status", status.toString());
+				jo.put("here", here);
+				
+				if(delayedUntil != null){
+					jo.put("delayUntil", Utils.saveCalendar(delayedUntil));
+				}
+				jo.put("whereType", whereType.toString());
 				
 				return jo;
 			} catch(Exception e){
@@ -68,10 +82,17 @@ public class TransitItem {
 			Stop r = new Stop();
 			r.where = jsonObject.getString("where");
 			
-			// TODO: Sort out deprecation
 			r.when = Utils.readCalendar( jsonObject.getString("when") );
 			r.platform = jsonObject.getString("platform");
 			r.status = Status.valueOf( jsonObject.getString("status") );
+			
+			// All new attributes since v1 MUST be optional!
+			if(jsonObject.has("delayUntil")){
+				r.delayedUntil = Utils.readCalendar( jsonObject.getString("delayUntil") );
+			} if(jsonObject.has("whereType")){
+				r.whereType = WhereType.valueOf(jsonObject.getString("whereType"));
+			} 
+			r.here = jsonObject.optBoolean("here", false);
 			
 			return r;
 		}

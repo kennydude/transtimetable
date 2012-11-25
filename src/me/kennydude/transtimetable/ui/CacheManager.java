@@ -24,7 +24,7 @@ public class CacheManager {
 	
 	public static String getCacheItem(Context c, String key, long expiryInSeconds){
 		try{
-			File cacheFile = new File(c.getCacheDir(), key + ".cache");
+			File cacheFile = new File(c.getCacheDir(), key.replace("/", "_") + ".cache");
 			if(!cacheFile.exists()) return null;
 			if(expiryInSeconds != -1 && cacheFile.lastModified() < new Date().getTime() - (expiryInSeconds * 1000)) return null;
 			
@@ -46,7 +46,7 @@ public class CacheManager {
 
 	public static void saveCache(Context c, String key, String string) {
 		try{
-			File cacheFile = new File(c.getCacheDir(), key + ".cache");
+			File cacheFile = new File(c.getCacheDir(), key.replace("/", "_") + ".cache");
 			if(!cacheFile.exists()){
 				cacheFile.getParentFile().mkdirs();
 				cacheFile.createNewFile();
@@ -62,7 +62,7 @@ public class CacheManager {
 	}
 
 	public static Calendar getLastSavedCached(Context c, String key) {
-		File cacheFile = new File(c.getCacheDir(), key + ".cache");
+		File cacheFile = new File(c.getCacheDir(), key.replace("/", "_") + ".cache");
 		Calendar r = Calendar.getInstance();
 		r.setTimeInMillis(cacheFile.lastModified());
 		return r;

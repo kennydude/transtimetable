@@ -30,6 +30,11 @@
         <activity
             android:label="@string/data_packs"
             android:name=".ui.PackList" />
+        <activity
+            android:label="@string/about"
+            android:name=".ui.AboutView" />
+        <activity
+            android:name=".ui.TransitItemView" />
         
         <activity
             android:name="me.kennydude.transtimetable.ui.StationList"

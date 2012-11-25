@@ -66,6 +66,8 @@ public class SearchStations extends Activity {
 		sla = new StationListAdapter(this);
 		StationList.setupStationListView(getListView(), sla, this);
 		getListView().setAdapter(sla);
+		
+		onNewIntent(getIntent());
 	}
 	
 	@Override
