@@ -1,3 +1,8 @@
 [
-	{ "country" : "gbr", "title" : "UK Pack", "description" : "Station data from generic UK providers", "pname" : "me.kennydude.transtimetable.uk" }
+	{
+		"country" : "gbr",
+		"title" : "UK Pack",
+		"description" : "Station data from generic UK providers. Currently this includes National Rail. More to come soon!",
+		"pname" : "me.kennydude.transtimetable.uk"
+	}
 ]
