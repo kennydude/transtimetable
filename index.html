@@ -21,15 +21,27 @@
         <p>Android Transit Timetable App!</p>
         <p class="view"><a href="https://github.com/kennydude/transtimetable">View the Project on GitHub <small>kennydude/transtimetable</small></a></p>
         <ul>
-          <li><a href="https://github.com/kennydude/transtimetable/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/kennydude/transtimetable/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://play.google.com/apps/details?id=me.kennydude.transtimetable">Download <strong>APP</strong></a></li>
           <li><a href="https://github.com/kennydude/transtimetable">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
         <h3>TransTimetable</h3>
 
-<p><a href="http://play.google.com/apps/details?id=me.kennydue.transtimetable">Get it on Google Play</a></p>
+<p>TransTimetable is an app which allows you to view timetables for transit services. However, it has a dynamic API which allows for anyone to write a plugin which provides data to the application!</p>
+
+<h4>Screenshots</h4>
+<table style="width:100%"><tr><td>
+  <img src="images/a.png" />
+</td><td>
+  <img src="images/b.png" />
+</td></tr></table>
+
+<h3>Packs</h3>
+<p>Data can be downloaded in "packs"<span class="packsOn gone">. And these are what we have</span></p>
+<div id="packs"></div>
+
+<p><a href="http://play.google.com/apps/details?id=me.kennydude.transtimetable">Get it on Google Play</a></p>
 
 <p><a href="http://github.com/kennydude/transtimetable">Developers, hack it!</a></p>
       </section>
@@ -39,6 +51,24 @@
       <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
     </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+    <SCRIPT TYPE="text/javascript" src="//code.jquery.com/jquery.js"></SCRIPT>
+    <SCRIPT TYPE="text/javascript">
+      $(document).ready(function(){
+        $.getJSON('datapacks.json', function(data) {
+          console.log(data);
+          $(".packsOn").show().removeClass("gone");
+          $.each(data, function(item){
+            item = data[item];
+            p = $("<p>").appendTo("#packs");
+            h = $("<h4>").html(item['title']).appendTo(p);
+            $("<div>").html(item['description']).appendTo(p);
+            $("<small>").html(" <a href='http://play.google.com/apps/details?id="+item['pname']+"'>Download from Google Play").appendTo(p);
+            $("<br/><br/>").appendTo(p);
+            $("<hr/>").appendTo(p);
+          });
+        });
+      });
+    </SCRIPT>
+
   </body>
 </html>
