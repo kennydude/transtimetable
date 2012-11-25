@@ -1,0 +1,7 @@
+bin
+res
+src
+.project
+gen
+datapacks/
+/.classpath
