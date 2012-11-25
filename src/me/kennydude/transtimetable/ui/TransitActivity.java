@@ -50,7 +50,7 @@ public abstract class TransitActivity extends Activity {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				List<Object> b = (List<Object>) cback.getStations( new TransServiceBinder( (ITransService) binder ), cn );
+				List<Object> b = (List<Object>) cback.getStations( new TransServiceBinder( ITransService.Stub.asInterface( binder ) ), cn );
 				if(b != null)
 					results.addAll( b );
 				
@@ -115,7 +115,7 @@ public abstract class TransitActivity extends Activity {
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder binder) {
 			mBound = true;
-			mTransService = new TransServiceBinder((ITransService) binder);
+			mTransService = new TransServiceBinder(ITransService.Stub.asInterface( binder ) );
 			onConnectedToBackendService();
 		}
 

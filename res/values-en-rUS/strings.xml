@@ -3,4 +3,38 @@
     <string name="favourite">Favorite</string>
     <string name="favourites">Favorites</string>
     
+        <string name="app_name">TransTimetable</string>
+    <string name="departures">Departures</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="loading">One Moment Please. Downloading data…</string>
+    <string name="arrives_at">Arrives in {time} ({brick})</string>
+    
+    <string name="relocate_me">Relocate Me</string>
+    
+    <string name="empty">Empty</string>
+    
+    <string name="late">LATE</string>
+    <string name="on_time">OK</string>
+    <string name="unknown">\?</string>
+    <string name="canceled">NO</string>
+    <string name="gone">OLD</string>
+    <string name="starts_here">STARTS</string>
+    <string name="refresh">Refresh</string>
+    
+    <string name="nearby">Nearby Stations</string>
+    
+    <string name="last_refreshed">Last Refreshed at {time}</string>
+    
+    <string name="permission">Use Transit Data</string>
+    
+    <string name="permission_desc">Use Transit data provided by plugins installed on the device</string>
+    
+    <string name="search">Search</string>
+    
+    <string name="search_stations">Search for stations by name</string>
+    
+    <string name="data_packs">Get Data Packs</string>
+    <string name="install">Install</string>
+    <string name="pack_description">TransTimetable needs plugins to work so you are getting the data that is relevant to you!</string>
+    
 </resources>
