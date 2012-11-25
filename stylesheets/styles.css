@@ -70,6 +70,12 @@ header {
   padding: 15px 20px;
   border-bottom: 1px solid #B2D2E1;
 }
+header img{
+  float: left;
+  margin-right: 7px;
+  margin-top: -10px;
+}
+
 header h1 {
   margin: 0;
   padding: 0;
@@ -339,8 +345,19 @@ footer p + p {
   }
 }
 @media print, screen and (max-width:580px) {
-  header ul {
-    display: none;
+  header ul{
+    position: static; 
+    margin: 0 auto;
+    display: inline-block;
+  }
+
+  header .ulC{
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  header p{
+    clear: both;
   }
 
   header p.view {
