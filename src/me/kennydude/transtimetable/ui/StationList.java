@@ -116,6 +116,7 @@ public class StationList extends Activity {
 			break;
 		case R.id.packs:
 			Intent i = new Intent(this, PackList.class);
+			i.putExtra("homeOK", true);
 			startActivity(i);
 			break;
 		case R.id.search:

@@ -23,6 +23,7 @@ public class TransitItem {
 	public String id = "";
 	
 	public String operator = "";
+	public String line = "";
 	public String from = "";
 	public String to = "";
 	
@@ -91,7 +92,7 @@ public class TransitItem {
 				r.delayedUntil = Utils.readCalendar( jsonObject.getString("delayUntil") );
 			} if(jsonObject.has("whereType")){
 				r.whereType = WhereType.valueOf(jsonObject.getString("whereType"));
-			} 
+			}
 			r.here = jsonObject.optBoolean("here", false);
 			
 			return r;
@@ -117,6 +118,7 @@ public class TransitItem {
 				jstops.put( stop.toJSONObject() );
 			}
 			jo.put("stops", jstops);
+			jo.put("line", line);
 			
 			return jo;
 		} catch(Exception e){
@@ -133,6 +135,9 @@ public class TransitItem {
 		ti.to = jsonObject.getString("to");
 		ti.type = TransitItem.TransitType.valueOf( jsonObject.getString("type") );
 		ti.preferedStop = jsonObject.getInt("preferedStop");
+		
+		// All new properties since v1 must be optional
+		ti.line = jsonObject.optString("line");
 		
 		if(jsonObject.has("stops")){
 			JSONArray ja = jsonObject.getJSONArray("stops");

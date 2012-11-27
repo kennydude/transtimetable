@@ -89,4 +89,19 @@ public class Utils {
 		
 		return c;
 	}
+	
+	/**
+	 * Check if lat and lon are inside a bounding set of lat/lons
+	 * 
+	 * This is used in the TfL plugin (UK Pack) first of all to skip checks if we are actually nots
+	 * inside of London
+	 */
+	public static boolean isContained( double boundLeftLat, double boundLeftLon, double boundRightLat, double boundRightLon, double lat, double lon ){
+		if( boundLeftLat <= lat && boundLeftLon <= lon ){
+			if( boundRightLat >= lat && boundRightLon >= lon ){
+				return true;
+			}
+		}
+		return false;
+	}
 }

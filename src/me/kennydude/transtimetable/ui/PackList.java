@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +47,10 @@ public class PackList extends ListActivity {
 		pa = new PackAdapter(this);
 		setListAdapter(pa);
 		
+		if(getIntent().hasExtra("homeOK")){
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+		
 		getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
@@ -63,6 +68,18 @@ public class PackList extends ListActivity {
 		
 		
 		refresh();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item){
+		switch(item.getItemId()){
+		case android.R.id.home:
+			Intent intent = new Intent(this, StationList.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	public void refresh(){
